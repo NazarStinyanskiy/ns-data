@@ -9,4 +9,5 @@ var Db = &cobra.Command{
 
 func init() {
 	Db.AddCommand(initCmd)
+	Db.AddCommand(connect)
 }
