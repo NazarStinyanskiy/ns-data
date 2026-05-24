@@ -18,6 +18,10 @@ type ColumnType string
 const INTEGER ColumnType = "INTEGER"
 const VARCHAR ColumnType = "VARCHAR"
 
+var ValidColumnTypes = []ColumnType{INTEGER, VARCHAR}
+
 type Modifier string
 
 const PK Modifier = "PK"
+
+var ValidModifiers = []Modifier{PK}
