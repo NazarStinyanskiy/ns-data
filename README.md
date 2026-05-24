@@ -16,7 +16,7 @@ Relational Database Management System
 <code>./bin/nsdata db connect {db_name}</code>
 
 ### Available commands
-<code>CREATE TABLE ( {column_name} {column_type} {column_modifier} , ... )</code> - Please, separate all parts with spaces. Will be adjusted in the future.
+<code>CREATE TABLE ( {column_name} {column_type} {column_modifier} , ... )</code>
 
 
 <code>LIST TABLES</code>
