@@ -13,6 +13,9 @@ func PrepareCommands() {
 	create := map[string]interface{}{
 		"table": createTable,
 	}
+	del := map[string]interface{}{
+		"table": deleteTable,
+	}
 	describe := map[string]interface{}{
 		"table": describeTable,
 	}
@@ -20,6 +23,7 @@ func PrepareCommands() {
 		"tables": listTables,
 	}
 	commands["create"] = create
+	commands["delete"] = del
 	commands["describe"] = describe
 	commands["list"] = list
 }

@@ -265,6 +265,76 @@ func TestExecute_ListTables_TooManyArgs(t *testing.T) {
 	}
 }
 
+// --- delete table ---
+
+func TestExecute_DeleteTable_NoTableName(t *testing.T) {
+	err := Execute("delete table", emptyDB())
+	if err == nil {
+		t.Fatal("expected error when table name is missing")
+	}
+}
+
+func TestExecute_DeleteTable_TooManyArgs(t *testing.T) {
+	err := Execute("delete table employees extra", emptyDB())
+	if err == nil {
+		t.Fatal("expected error for extra arguments after table name")
+	}
+}
+
+func TestExecute_DeleteTable_UnknownTable(t *testing.T) {
+	db := emptyDB()
+	db.NsDataMetadata.Tables = []catalog.Table{{Name: "orders"}}
+
+	err := Execute("delete table employees", db)
+	if err == nil {
+		t.Fatal("expected error for unknown table")
+	}
+}
+
+func TestExecute_DeleteTable_EmptyDB(t *testing.T) {
+	err := Execute("delete table employees", emptyDB())
+	if err == nil {
+		t.Fatal("expected error when no tables exist")
+	}
+}
+
+func TestExecute_DeleteTable_Success(t *testing.T) {
+	db, cleanup := diskDB(t)
+	defer cleanup()
+	db.NsDataMetadata.Tables = []catalog.Table{
+		{Name: "employees", Columns: []catalog.Column{{Name: "id", Type: catalog.INTEGER, Modifiers: []catalog.Modifier{catalog.PK}}}},
+	}
+
+	if err := Execute("delete table employees", db); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(db.NsDataMetadata.Tables) != 0 {
+		t.Fatalf("expected 0 tables after delete, got %d", len(db.NsDataMetadata.Tables))
+	}
+}
+
+func TestExecute_DeleteTable_OnlyTargetRemoved(t *testing.T) {
+	db, cleanup := diskDB(t)
+	defer cleanup()
+	db.NsDataMetadata.Tables = []catalog.Table{
+		{Name: "employees", Columns: []catalog.Column{{Name: "id", Type: catalog.INTEGER, Modifiers: []catalog.Modifier{catalog.PK}}}},
+		{Name: "orders", Columns: []catalog.Column{{Name: "id", Type: catalog.INTEGER, Modifiers: []catalog.Modifier{catalog.PK}}}},
+		{Name: "products", Columns: []catalog.Column{{Name: "id", Type: catalog.INTEGER, Modifiers: []catalog.Modifier{catalog.PK}}}},
+	}
+
+	if err := Execute("delete table orders", db); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(db.NsDataMetadata.Tables) != 2 {
+		t.Fatalf("expected 2 tables after delete, got %d", len(db.NsDataMetadata.Tables))
+	}
+	for _, tbl := range db.NsDataMetadata.Tables {
+		if tbl.Name == "orders" {
+			t.Fatal("'orders' should have been deleted")
+		}
+	}
+}
+
 // --- describe table ---
 
 func TestExecute_DescribeTable_NoTableName(t *testing.T) {
